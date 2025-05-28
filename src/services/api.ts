@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = 'https://number-game-backend-e24m.onrender.com';
 
 export interface Score {
   name: string;
