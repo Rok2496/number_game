@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { Box } from '@chakra-ui/react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
-const MotionBox = motion(Box);
-
 export const CursorFollower = () => {
   const [isVisible, setIsVisible] = useState(false);
   const cursorX = useMotionValue(-100);
@@ -35,19 +33,19 @@ export const CursorFollower = () => {
 
   return (
     <>
-      <MotionBox
+      <motion.div
         style={{
           x: smoothX,
           y: smoothY,
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '32px',
+          height: '32px',
+          zIndex: 9999,
+          pointerEvents: 'none',
+          opacity: isVisible ? 1 : 0,
         }}
-        position="fixed"
-        top={0}
-        left={0}
-        w="32px"
-        h="32px"
-        zIndex={9999}
-        pointerEvents="none"
-        opacity={isVisible ? 1 : 0}
         transition={{ duration: 0.2 }}
       >
         <Box
@@ -66,17 +64,18 @@ export const CursorFollower = () => {
             borderRadius="full"
             boxShadow="0 0 20px rgba(66, 153, 225, 0.6)"
           />
-          <Box
-            as={motion.div}
-            position="absolute"
-            top="50%"
-            left="50%"
-            transform="translate(-50%, -50%)"
-            w="32px"
-            h="32px"
-            border="2px solid"
-            borderColor="blue.400"
-            borderRadius="full"
+          <motion.div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '32px',
+              height: '32px',
+              border: '2px solid',
+              borderColor: 'rgb(66, 153, 225)',
+              borderRadius: '9999px',
+            }}
             animate={{
               scale: [1, 1.2, 1],
             }}
@@ -87,7 +86,7 @@ export const CursorFollower = () => {
             }}
           />
         </Box>
-      </MotionBox>
+      </motion.div>
     </>
   );
 }; 

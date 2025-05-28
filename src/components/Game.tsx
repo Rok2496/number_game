@@ -4,10 +4,8 @@ import {
   Button,
   Input,
   VStack,
-  Text,
   useToast,
   Heading,
-  useColorModeValue,
   keyframes,
 } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,12 +22,6 @@ const glow = keyframes`
   0% { box-shadow: 0 0 20px rgba(66, 153, 225, 0.3) }
   50% { box-shadow: 0 0 30px rgba(66, 153, 225, 0.6) }
   100% { box-shadow: 0 0 20px rgba(66, 153, 225, 0.3) }
-`;
-
-const bloodRiver = keyframes`
-  0% { transform: scale(1); opacity: 0; filter: blur(2px); }
-  20% { transform: scale(1.1); opacity: 0.9; filter: blur(4px); }
-  100% { transform: scale(1.05); opacity: 1; filter: blur(8px); }
 `;
 
 const welcomeText = keyframes`
@@ -59,9 +51,6 @@ export const Game = ({ playerName, onGameComplete }: GameProps) => {
   const [showBloodOverlay, setShowBloodOverlay] = useState(false);
   const [showWelcomeBack, setShowWelcomeBack] = useState(false);
   const toast = useToast();
-
-  const bgColor = useColorModeValue('white', 'gray.700');
-  const borderColor = useColorModeValue('gray.200', 'gray.600');
 
   useEffect(() => {
     handleStartGame();
@@ -154,21 +143,17 @@ export const Game = ({ playerName, onGameComplete }: GameProps) => {
 
   const handleGuessResult = (result: any) => {
     let hintMessage = result.result;
-    let hintColor = "blue.500";
     let hintEmoji = "";
 
     if (result.result === "Too low!") {
       hintMessage = "Too Low";
       hintEmoji = "📈";
-      hintColor = "orange.400";
     } else if (result.result === "Too high!") {
       hintMessage = "Too High";
       hintEmoji = "📉";
-      hintColor = "purple.400";
     } else if (result.result === "Correct!") {
       hintMessage = "Correct!";
       hintEmoji = "🎉";
-      hintColor = "green.500";
       setIsCorrect(true);
       setShowConfetti(true);
       toast({

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box } from '@chakra-ui/react';
-import { motion, useMotionValue, useAnimation } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 
 interface SmokeParticle {
   x: number;
@@ -86,18 +86,16 @@ export const PredatorSnake = () => {
   const [particles, setParticles] = useState<SmokeParticle[]>([]);
   const [isHunting, setIsHunting] = useState(false);
   const [showBloodOverlay, setShowBloodOverlay] = useState(false);
+  const [showWelcomeBack, setShowWelcomeBack] = useState(false);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-  const ghostPosition = useMotionValue({ x: -100, y: -100, z: 0 });
   const targetX = useRef(-100);
   const targetY = useRef(-100);
   const lastMoveTime = useRef(Date.now());
   const lastCursorMoveTime = useRef(Date.now());
   const isEating = useRef(false);
-  const huntingPhase = useRef(0);
   const animationFrame = useRef(0);
   const controls = useAnimation();
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [showWelcomeBack, setShowWelcomeBack] = useState(false);
   const [isFullBlood, setIsFullBlood] = useState(false);
 
   useEffect(() => {
