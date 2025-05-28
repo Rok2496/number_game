@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: horror-game
+  labels:
+    name: horror-game
+    environment: production 

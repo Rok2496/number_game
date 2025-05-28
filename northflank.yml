@@ -1,0 +1,38 @@
+services:
+  frontend:
+    name: horror-game-frontend
+    type: container
+    container:
+      registry: registry.northflank.com
+      image: ${REGISTRY_IMAGE}
+      tag: ${REGISTRY_TAG}
+    ports:
+      - port: 80
+        public: true
+    resources:
+      cpu: shared
+      memory: 256
+    env:
+      - name: NODE_ENV
+        value: production
+    healthcheck:
+      path: /health
+      port: 80
+
+  redis:
+    name: horror-game-redis
+    type: container
+    container:
+      image: redis:alpine
+    ports:
+      - port: 6379
+    resources:
+      cpu: shared
+      memory: 256
+    volumes:
+      - name: redis-data
+        path: /data
+    command:
+      - redis-server
+      - --appendonly
+      - "yes" 
