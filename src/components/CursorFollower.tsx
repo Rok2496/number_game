@@ -48,7 +48,7 @@ export const CursorFollower = () => {
         zIndex={9999}
         pointerEvents="none"
         opacity={isVisible ? 1 : 0}
-        transition="opacity 0.2s"
+        transition={{ duration: 0.2 }}
       >
         <Box
           position="relative"

@@ -93,7 +93,7 @@ export const SnakeCursor = () => {
           zIndex={9999}
           pointerEvents="none"
           opacity={isVisible ? (1 - index / segments.length) * 0.8 : 0}
-          transition="opacity 0.2s"
+          transition={{ opacity: { duration: 0.2 } }}
         >
           <Box
             position="relative"

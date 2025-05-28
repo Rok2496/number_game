@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
-import { motion, useMotionValue, useSpring, useAnimation, AnimatePresence } from 'framer-motion';
+import { Box } from '@chakra-ui/react';
+import { motion, useMotionValue, useAnimation } from 'framer-motion';
 
 interface SmokeParticle {
   x: number;
@@ -13,7 +13,6 @@ interface SmokeParticle {
 }
 
 const MotionBox = motion(Box);
-const MotionText = motion(Text);
 
 const bloodOverlay = `
   @keyframes bloodRiver {
@@ -235,9 +234,24 @@ export const PredatorSnake = () => {
       setCursorPosition({ x: e.clientX, y: e.clientY });
       lastCursorMoveTime.current = Date.now();
       
-      // If we're in hunting/blood mode, restore the screen immediately
       if (isHunting || isFullBlood) {
         stopHunting();
+        setShowWelcomeBack(true);
+        
+        setTimeout(() => {
+          setShowWelcomeBack(false);
+          setParticles(prevParticles => {
+            const newParticles = [...prevParticles];
+            newParticles[0] = {
+              ...newParticles[0],
+              x: -100,
+              y: -100,
+              scale: 1,
+              opacity: 0.3,
+            };
+            return newParticles;
+          });
+        }, 3000);
       }
 
       // Clear and reset idle timer
@@ -245,9 +259,25 @@ export const PredatorSnake = () => {
         clearTimeout(idleTimer.current);
       }
       idleTimer.current = setTimeout(() => {
-        startHunting();
-      }, 8000);
+        const currentTime = Date.now();
+        const idleTime = currentTime - lastCursorMoveTime.current;
+        
+        // Only start hunting if cursor has been idle for 15 seconds
+        if (idleTime >= 15000 && !isHunting && !isFullBlood) {
+          startHunting();
+        }
+      }, 15000); // Set to 15 seconds
     };
+
+    // Initial idle timer setup
+    idleTimer.current = setTimeout(() => {
+      const currentTime = Date.now();
+      const idleTime = currentTime - lastCursorMoveTime.current;
+      
+      if (idleTime >= 15000 && !isHunting && !isFullBlood) {
+        startHunting();
+      }
+    }, 15000);
 
     window.addEventListener('mousemove', handleMouseMove);
     animationFrame.current = requestAnimationFrame(updateGhostPosition);
@@ -352,7 +382,7 @@ export const PredatorSnake = () => {
         </>
       )}
 
-      {/* Welcome Back Message with improved animation */}
+      {/* Welcome Back Message */}
       {showWelcomeBack && (
         <Box
           position="fixed"
@@ -364,7 +394,7 @@ export const PredatorSnake = () => {
           color="white"
           pointerEvents="none"
         >
-          <Text
+          <MotionBox
             fontSize="7xl"
             fontWeight="bold"
             style={{
@@ -376,8 +406,8 @@ export const PredatorSnake = () => {
             }}
           >
             Welcome Back to Earth
-          </Text>
-          <Text
+          </MotionBox>
+          <MotionBox
             fontSize="2xl"
             color="gray.300"
             mt={4}
@@ -387,7 +417,7 @@ export const PredatorSnake = () => {
             }}
           >
             You escaped the reaper... for now
-          </Text>
+          </MotionBox>
         </Box>
       )}
 
@@ -690,7 +720,7 @@ export const PredatorSnake = () => {
 
       {/* Death Message */}
       {isFullBlood && (
-        <Text
+        <MotionBox
           position="fixed"
           top="50%"
           left="50%"
@@ -707,7 +737,7 @@ export const PredatorSnake = () => {
           letterSpacing="wider"
         >
           YOUR SOUL IS MINE! 💀
-        </Text>
+        </MotionBox>
       )}
     </>
   );

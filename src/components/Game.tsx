@@ -7,12 +7,10 @@ import {
   Text,
   useToast,
   Heading,
-  ScaleFade,
-  keyframes,
   useColorModeValue,
+  keyframes,
 } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaDice, FaCheck, FaTimes } from 'react-icons/fa';
 import ReactConfetti from 'react-confetti';
 import { startGame, makeGuess } from '../services/api';
 
@@ -20,19 +18,30 @@ const MotionBox = motion(Box);
 const MotionVStack = motion(VStack);
 const MotionInput = motion(Input);
 const MotionButton = motion(Button);
-const MotionText = motion(Text);
 const MotionHeading = motion(Heading);
-
-const float = keyframes`
-  0% { transform: translateY(0px) }
-  50% { transform: translateY(-10px) }
-  100% { transform: translateY(0px) }
-`;
 
 const glow = keyframes`
   0% { box-shadow: 0 0 20px rgba(66, 153, 225, 0.3) }
   50% { box-shadow: 0 0 30px rgba(66, 153, 225, 0.6) }
   100% { box-shadow: 0 0 20px rgba(66, 153, 225, 0.3) }
+`;
+
+const bloodRiver = keyframes`
+  0% { transform: scale(1); opacity: 0; filter: blur(2px); }
+  20% { transform: scale(1.1); opacity: 0.9; filter: blur(4px); }
+  100% { transform: scale(1.05); opacity: 1; filter: blur(8px); }
+`;
+
+const welcomeText = keyframes`
+  0% { transform: translateY(-50px); opacity: 0; filter: blur(10px); }
+  50% { transform: translateY(0); opacity: 1; filter: blur(0px); }
+  100% { transform: translateY(50px); opacity: 0; filter: blur(10px); }
+`;
+
+const bloodPulse = keyframes`
+  0% { background: rgba(139, 0, 0, 0.2); }
+  50% { background: rgba(139, 0, 0, 0.4); }
+  100% { background: rgba(139, 0, 0, 0.2); }
 `;
 
 interface GameProps {
@@ -47,6 +56,8 @@ export const Game = ({ playerName, onGameComplete }: GameProps) => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const [showBloodOverlay, setShowBloodOverlay] = useState(false);
+  const [showWelcomeBack, setShowWelcomeBack] = useState(false);
   const toast = useToast();
 
   const bgColor = useColorModeValue('white', 'gray.700');
@@ -55,6 +66,33 @@ export const Game = ({ playerName, onGameComplete }: GameProps) => {
   useEffect(() => {
     handleStartGame();
   }, []);
+
+  // Add blood overlay effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowBloodOverlay(true);
+    }, 5000);
+
+    const handleMouseMove = () => {
+      if (showBloodOverlay) {
+        setShowBloodOverlay(false);
+        handleWelcomeBack();
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [showBloodOverlay]);
+
+  // Add welcome back effect
+  const handleWelcomeBack = () => {
+    setShowWelcomeBack(true);
+    setTimeout(() => setShowWelcomeBack(false), 3000);
+  };
 
   const handleStartGame = async () => {
     try {
@@ -153,6 +191,58 @@ export const Game = ({ playerName, onGameComplete }: GameProps) => {
 
   return (
     <>
+      {showBloodOverlay && (
+        <Box
+          position="fixed"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bg="rgba(139, 0, 0, 0.2)"
+          zIndex={9997}
+          animation={`${bloodPulse} 3s infinite`}
+          pointerEvents="none"
+        />
+      )}
+
+      {showWelcomeBack && (
+        <Box
+          position="fixed"
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          zIndex={9999}
+          textAlign="center"
+          color="white"
+          pointerEvents="none"
+        >
+          <MotionBox
+            fontSize="7xl"
+            fontWeight="bold"
+            css={{
+              animation: `${welcomeText} 3s forwards`,
+              textShadow: '0 0 20px rgba(255,255,255,0.5)',
+              background: 'linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            Welcome Back to Earth
+          </MotionBox>
+          <MotionBox
+            fontSize="2xl"
+            color="gray.300"
+            mt={4}
+            css={{
+              animation: `${welcomeText} 3s forwards`,
+              animationDelay: '0.5s',
+            }}
+          >
+            You escaped the reaper... for now
+          </MotionBox>
+        </Box>
+      )}
+
       {showConfetti && <ReactConfetti recycle={false} numberOfPieces={200} />}
       <MotionVStack
         spacing={8}
@@ -171,22 +261,20 @@ export const Game = ({ playerName, onGameComplete }: GameProps) => {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
           whileHover={{ scale: 1.05 }}
-          css={{ animation: `${float} 3s ease-in-out infinite` }}
         >
           Welcome, {playerName}! 👋
         </MotionHeading>
 
-        <MotionText
+        <MotionBox
           fontSize="2xl"
           color="blue.400"
           textAlign="center"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          css={{ animation: `${glow} 2s ease-in-out infinite` }}
         >
           Attempts: {attempts}
-        </MotionText>
+        </MotionBox>
 
         <MotionVStack
           spacing={6}
